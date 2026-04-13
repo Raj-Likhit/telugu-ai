@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@deepgram/sdk": "^5.0.0",
-    "@elevenlabs/elevenlabs-js": "^2.42.0",
     "@google/generative-ai": "^0.24.1",
     "@vercel/blob": "^2.3.3",
     "axios": "^1.15.0",

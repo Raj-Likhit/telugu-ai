@@ -14,7 +14,7 @@ export default function Home() {
   const statusItems = [
     { name: "Deepgram STT", status: "Operational", icon: <Mic className="w-5 h-5" /> },
     { name: "Gemini 1.5 Flash", status: "Operational", icon: <Zap className="w-5 h-5" /> },
-    { name: "ElevenLabs TTS", status: "Operational", icon: <Settings className="w-5 h-5" /> },
+    { name: "Sarvam AI TTS", status: "Operational", icon: <Settings className="w-5 h-5" /> },
   ];
 
   return (
@@ -53,7 +53,7 @@ export default function Home() {
             </h2>
             <p className="text-lg text-slate-400 mb-10 max-w-lg leading-relaxed">
               Experience natural voice-to-voice communication in Telugu. Powered by Deepgram, 
-              Gemini 1.5, and ElevenLabs. Simple, fast, and accessible through WhatsApp.
+              Gemini 1.5, and Sarvam AI. Simple, fast, and accessible through WhatsApp.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">

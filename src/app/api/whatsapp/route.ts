@@ -39,9 +39,9 @@ export async function POST(req: NextRequest) {
       console.log("No media found. User likely sent text.");
       const userText = params["Body"] || "";
       if (userText) {
-          console.log("Processing text message with ElevenLabs Agent");
-          const { audio: replyAudio, text: aiText } = await generateAgentResponse(userText);
-          console.log("Agent Text Response:", aiText);
+          console.log("Processing text message with Sarvam AI");
+          const aiText = await generateSarvamResponse(userText);
+          const replyAudio = await generateSarvamSpeech(aiText);
           
           const { url: audioUrl } = await put(`replies/${Date.now()}.mp3`, replyAudio, {
             access: "public",
