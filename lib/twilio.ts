@@ -21,10 +21,13 @@ export function validateTwilioRequest(
  * Generates a TwiML response to play an audio file.
  */
 export function generateVoicePlayResponse(audioUrl: string): string {
-  // Use a minimal template for playing audio
+  // IMPORTANT: For WhatsApp Messaging, we use <Message> and <Media> verbs.
+  // <Play> is exclusively for Voice calls.
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    ${audioUrl ? `<Play>${audioUrl}</Play>` : '<Say language="te-IN">క్షమించండి, ఆడియో లోడ్ అవ్వలేదు.</Say>'}
+    <Message>
+        ${audioUrl ? `<Media>${audioUrl}</Media>` : '<Body>క్షమించండి, ఆడియో లోడ్ అవ్వలేదు.</Body>'}
+    </Message>
 </Response>`;
 }
 
