@@ -32,44 +32,60 @@ export class WhatsAppProcessor {
   }
 
   private static async handleVoiceMessage(params: WhatsAppParams, mediaUrl: string): Promise<string> {
-    console.log(`Processing voice message from ${params.From}`);
+    try {
+      console.log(`[Processor] Processing voice message from ${params.From}`);
 
-    // 1. Download Voice Note
-    const audioResponse = await fetch(mediaUrl);
-    if (!audioResponse.ok) throw new Error("Failed to download Twilio media");
-    const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
+      // 1. Download Voice Note
+      const audioResponse = await fetch(mediaUrl);
+      if (!audioResponse.ok) throw new Error("Failed to download Twilio media");
+      const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
+      console.log(`[Processor] Voice note downloaded: ${audioBuffer.length} bytes`);
 
-    // 2. STT: Deepgram
-    const transcription = await transcribeAudio(audioBuffer);
-    if (!transcription) {
-      console.log("No transcription obtained.");
-      return generateVoicePlayResponse(""); 
+      // 2. STT: Deepgram
+      const transcription = await transcribeAudio(audioBuffer);
+      if (!transcription) {
+        console.log("[Processor] No transcription obtained.");
+        return generateVoicePlayResponse(""); 
+      }
+      console.log(`[Processor] Transcription: ${transcription}`);
+
+      // 3. AI Pipeline: LLM -> TTS
+      const aiText = await generateSarvamResponse(transcription);
+      console.log(`[Processor] AI Response: ${aiText}`);
+      const replyAudioBuffer = await generateSarvamSpeech(aiText);
+      console.log(`[Processor] Audio generated: ${replyAudioBuffer.length} bytes`);
+
+      // 4. Storage & Response
+      const audioUrl = await this.storageAudio(replyAudioBuffer, params.MessageSid);
+      console.log(`[Processor] Storage success: ${audioUrl}`);
+      return generateVoicePlayResponse(audioUrl);
+    } catch (error: any) {
+      console.error("[Processor] Error in handleVoiceMessage:", error.message);
+      throw error;
     }
-    console.log(`User: ${transcription}`);
-
-    // 3. AI Pipeline: LLM -> TTS
-    const aiText = await generateSarvamResponse(transcription);
-    console.log(`AI: ${aiText}`);
-    const replyAudioBuffer = await generateSarvamSpeech(aiText);
-
-    // 4. Storage & Response
-    const audioUrl = await this.storageAudio(replyAudioBuffer, params.MessageSid);
-    return generateVoicePlayResponse(audioUrl);
   }
 
   private static async handleTextMessage(params: WhatsAppParams): Promise<string> {
-    const userText = params.Body || "";
-    if (!userText) return "<Response />";
+    try {
+      const userText = params.Body || "";
+      if (!userText) return "<Response />";
 
-    console.log(`Processing text message from ${params.From}: ${userText}`);
+      console.log(`[Processor] Processing text message from ${params.From}: ${userText}`);
 
-    // AI Pipeline: LLM -> TTS
-    const aiText = await generateSarvamResponse(userText);
-    const replyAudioBuffer = await generateSarvamSpeech(aiText);
+      // AI Pipeline: LLM -> TTS
+      const aiText = await generateSarvamResponse(userText);
+      console.log(`[Processor] AI Response: ${aiText}`);
+      const replyAudioBuffer = await generateSarvamSpeech(aiText);
+      console.log(`[Processor] Audio generated: ${replyAudioBuffer.length} bytes`);
 
-    // Storage & Response
-    const audioUrl = await this.storageAudio(replyAudioBuffer, params.MessageSid);
-    return generateVoicePlayResponse(audioUrl);
+      // Storage & Response
+      const audioUrl = await this.storageAudio(replyAudioBuffer, params.MessageSid);
+      console.log(`[Processor] Storage success: ${audioUrl}`);
+      return generateVoicePlayResponse(audioUrl);
+    } catch (error: any) {
+      console.error("[Processor] Error in handleTextMessage:", error.message);
+      throw error;
+    }
   }
 
   private static async storageAudio(buffer: Buffer, messageSid?: string): Promise<string> {
