@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🇮🇳 Telugu AI - WhatsApp Voice Assistant
 
-## Getting Started
+Telugu AI is a high-fidelity voice and text assistant built exclusively for the Telugu language. It uses state-of-the-art Indian language models from **Sarvam AI** and **Deepgram** to provide natural, human-like voice interactions over WhatsApp.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Step-by-Step Setup Guide
+
+### 1. Get Your API Keys
+You will need accounts and API keys from the following services:
+
+*   **[Sarvam AI](https://www.sarvam.ai/)**: Used for the LLM (Sarvam-30b) and TTS (Bulbul v3).
+*   **[Deepgram](https://console.deepgram.com/)**: Used for Telugu Speech-to-Text (STT).
+*   **[Twilio](https://www.twilio.com/console)**: For the WhatsApp Sandbox and messaging.
+*   **[Vercel Blob](https://vercel.com/storage/blob)**: To store and serve generated audio replies.
+
+### 2. Configure Environment Variables
+Create a `.env.local` file in the root directory and add the following keys:
+
+```env
+# Twilio Credentials
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
+
+# Deepgram (STT)
+DEEPGRAM_API_KEY=your_key
+
+# Sarvam AI (LLM & TTS)
+SARVAM_API_KEY=your_key
+
+# Vercel Blob (Storage)
+BLOB_READ_WRITE_TOKEN=your_token
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=https://your-app-url.vercel.app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> [!IMPORTANT]
+> The application performs a startup validation. If any of the critical keys (Sarvam, Deepgram, Twilio) are missing, the server will throw an error immediately.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Set Up Twilio WhatsApp Sandbox
+1.  Go to the [Twilio Console > Messaging > Try it Out > WhatsApp Sandbox](https://www.twilio.com/console/sms/whatsapp/learn).
+2.  Connect your phone by sending the join code (e.g., `join word-word`).
+3.  In the **Sandbox Settings**, set the **"When a message comes in"** URL to:
+    `https://your-app-url.vercel.app/api/whatsapp`
+4.  Ensure the method is set to **HTTP POST**.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Local Development & Testing
+If you are testing locally, use a tool like **ngrok** to expose your local server:
 
-## Learn More
+1.  Start the dev server: `npm run dev`
+2.  Run ngrok: `ngrok http 3000`
+3.  Copy the `https` URL from ngrok and paste it into the Twilio Sandbox settings as explained in Step 3.
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Interaction
+*   **Text Message**: Send a message in Telugu to the sandbox number. You will receive an audio reply in Telugu.
+*   **Voice Message**: Send a voice note. The assistant will transcribe it, reason in Telugu, and send back a high-quality voice response.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠 Architecture Overview
 
-## Deploy on Vercel
+The project is designed with a modular, service-oriented architecture:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **`src/app/api/whatsapp/route.ts`**: The entry point that validates signatures and handles the HTTP request.
+- **`src/services/whatsapp-processor.ts`**: The core orchestrator that manages the STT -> LLM -> TTS pipeline.
+- **`lib/`**: Contains specialized wrappers for [Sarvam AI](file:///lib/sarvam.ts), [Deepgram](file:///lib/deepgram.ts), and [Twilio](file:///lib/twilio.ts).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🚢 Deployment (Vercel)
+
+1.  Connect your GitHub repository to Vercel.
+2.  Add all the variables from your `.env.local` to the **Environment Variables** section in the Vercel dashboard.
+3.  Deploy! Vercel will automatically configure the Blob storage if you follow the setup wizard in the "Storage" tab.
+
+---
+
+> [!TIP]
+> **Performance Optimization**: We use Deepgram's `nova-2` model for lightning-fast Telugu transcription and Sarvam's `bulbul:v3` for premium audio quality.
