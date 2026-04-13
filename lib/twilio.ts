@@ -1,4 +1,5 @@
 import { validateRequest } from "twilio";
+import { env } from "../src/config/env";
 
 /**
  * Validates the Twilio request signature.
@@ -9,7 +10,7 @@ export function validateTwilioRequest(
   signature: string
 ): boolean {
   return validateRequest(
-    process.env.TWILIO_AUTH_TOKEN!,
+    env.TWILIO_AUTH_TOKEN,
     signature,
     url,
     params
@@ -20,9 +21,10 @@ export function validateTwilioRequest(
  * Generates a TwiML response to play an audio file.
  */
 export function generateVoicePlayResponse(audioUrl: string): string {
+  // Use a minimal template for playing audio
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Play>${audioUrl}</Play>
+    ${audioUrl ? `<Play>${audioUrl}</Play>` : '<Say language="te-IN">క్షమించండి, ఆడియో లోడ్ అవ్వలేదు.</Say>'}
 </Response>`;
 }
 
