@@ -32,8 +32,6 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("WhatsApp Webhook Error:", error.message);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
- Broadway
