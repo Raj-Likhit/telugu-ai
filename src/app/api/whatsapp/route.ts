@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
     // 2. Process Message
     console.log("Starting WhatsAppProcessor...");
     const twiml = await WhatsAppProcessor.process(params as unknown as WhatsAppParams);
-    console.log("Processor Finished. TwiML Generated.");
+    console.log("Processor Finished. TwiML Generated:");
+    console.log(twiml);
 
     // 3. Return Response
     return new NextResponse(twiml, {

@@ -58,7 +58,7 @@ export class WhatsAppProcessor {
       // 4. Storage & Response
       const audioUrl = await this.storageAudio(replyAudioBuffer, params.MessageSid);
       console.log(`[Processor] Storage success: ${audioUrl}`);
-      return generateVoicePlayResponse(audioUrl);
+      return generateVoicePlayResponse(audioUrl, aiText);
     } catch (error: any) {
       console.error("[Processor] Error in handleVoiceMessage:", error.message);
       throw error;
@@ -81,7 +81,7 @@ export class WhatsAppProcessor {
       // Storage & Response
       const audioUrl = await this.storageAudio(replyAudioBuffer, params.MessageSid);
       console.log(`[Processor] Storage success: ${audioUrl}`);
-      return generateVoicePlayResponse(audioUrl);
+      return generateVoicePlayResponse(audioUrl, aiText);
     } catch (error: any) {
       console.error("[Processor] Error in handleTextMessage:", error.message);
       throw error;
