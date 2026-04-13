@@ -5,8 +5,7 @@ import {
   generateVoicePlayResponse 
 } from "../../../../lib/twilio";
 import { transcribeAudio } from "../../../../lib/deepgram";
-import { generateTeluguResponse } from "../../../../lib/gemini";
-import { generateSpeech } from "../../../../lib/elevenlabs";
+import { generateAgentResponse } from "../../../../lib/elevenlabs-agent";
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,8 +39,10 @@ export async function POST(req: NextRequest) {
       console.log("No media found. User likely sent text.");
       const userText = params["Body"] || "";
       if (userText) {
-          const aiResponse = await generateTeluguResponse(userText);
-          const replyAudio = await generateSpeech(aiResponse);
+          console.log("Processing text message with ElevenLabs Agent");
+          const { audio: replyAudio, text: aiText } = await generateAgentResponse(userText);
+          console.log("Agent Text Response:", aiText);
+          
           const { url: audioUrl } = await put(`replies/${Date.now()}.mp3`, replyAudio, {
             access: "public",
             contentType: "audio/mpeg",
@@ -70,14 +71,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. LLM: Gemini (Natural Telugu Response)
-    const teluguText = await generateTeluguResponse(transcription);
-    console.log("AI Telugu Response:", teluguText);
+    // 4. ElevenLabs Agent: Intelligence + Voice in one step (Uses Agent Credits)
+    const { audio: replyAudioBuffer, text: aiText } = await generateAgentResponse(transcription);
+    console.log("Agent Text Response:", aiText);
 
-    // 5. TTS: ElevenLabs (High-quality Telugu voice)
-    const replyAudioBuffer = await generateSpeech(teluguText);
-
-    // 6. Storage: Vercel Blob (Twilio needs a public URL to play)
+    // 5. Storage: Vercel Blob (Twilio needs a public URL to play)
     const fileName = `replies/${params["MessageSid"] || Date.now()}.mp3`;
     const { url: finalAudioUrl } = await put(fileName, replyAudioBuffer, {
       access: "public",

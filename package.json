@@ -10,21 +10,26 @@
   },
   "dependencies": {
     "@deepgram/sdk": "^5.0.0",
+    "@elevenlabs/elevenlabs-js": "^2.42.0",
     "@google/generative-ai": "^0.24.1",
     "@vercel/blob": "^2.3.3",
     "axios": "^1.15.0",
-    "elevenlabs": "^1.59.0",
+    "dotenv": "^17.4.2",
     "lucide-react": "^1.8.0",
     "next": "16.2.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "twilio": "^5.13.1"
+    "twilio": "^5.13.1",
+    "uuid": "^13.0.0",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
