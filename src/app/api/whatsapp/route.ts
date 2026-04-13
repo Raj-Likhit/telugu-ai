@@ -5,7 +5,7 @@ import {
   generateVoicePlayResponse 
 } from "../../../../lib/twilio";
 import { transcribeAudio } from "../../../../lib/deepgram";
-import { generateAgentResponse } from "../../../../lib/elevenlabs-agent";
+import { generateSarvamResponse, generateSarvamSpeech } from "../../../../lib/sarvam";
 
 export async function POST(req: NextRequest) {
   try {
@@ -71,9 +71,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. ElevenLabs Agent: Intelligence + Voice in one step (Uses Agent Credits)
-    const { audio: replyAudioBuffer, text: aiText } = await generateAgentResponse(transcription);
-    console.log("Agent Text Response:", aiText);
+    // 4. Sarvam AI: Intelligence then Voice (Two-step pipeline)
+    console.log("Generating response with Sarvam AI LLM...");
+    const aiText = await generateSarvamResponse(transcription);
+    console.log("Sarvam AI Text Response:", aiText);
+
+    console.log("Converting text to speech with Sarvam AI TTS...");
+    const replyAudioBuffer = await generateSarvamSpeech(aiText);
 
     // 5. Storage: Vercel Blob (Twilio needs a public URL to play)
     const fileName = `replies/${params["MessageSid"] || Date.now()}.mp3`;
@@ -84,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     console.log("Generated Final Audio URL:", finalAudioUrl);
 
-    // 7. TwiML: Instruct Twilio to Play the Audio
+    // 6. TwiML: Instruct Twilio to Play the Audio
     return new NextResponse(generateVoicePlayResponse(finalAudioUrl), {
       headers: { "Content-Type": "text/xml" },
     });
