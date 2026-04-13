@@ -6,7 +6,7 @@ function getGeminiModel() {
   if (!geminiModel) {
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "dummy");
     geminiModel = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
+      model: "gemini-1.5-flash-latest",
       systemInstruction: "You are a helpful assistant for Telugu speakers. Respond concisely and naturally in Telugu script. Avoid transliteration unless requested.",
     });
   }
