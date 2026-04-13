@@ -19,7 +19,7 @@ export async function generateSpeech(text: string): Promise<Buffer> {
   try {
     const client = getElevenLabsClient();
     const audioStream = await client.textToSpeech.convert(
-      process.env.ELEVENLABS_VOICE_ID || "pMs6shpSKGr7uL97HLJw", // Default voice
+      process.env.ELEVENLABS_VOICE_ID || "21m00T84X9ccid9uR70t", // Default voice (Rachel)
       {
         model_id: "eleven_multilingual_v2",
         text: text,
